@@ -19,9 +19,10 @@ pip-wheel-metadata/
 
 .ipynb_checkpoints/
 
-src/credit_score/data/raw/
-src/credit_score/data/cleaned/
-src/credit_score/data/splitted/
+data/raw/
+data/cleaned/
+data/splitted/
+data/test
 data/interim/
 data/external/
 src/credit_score/app/check.py

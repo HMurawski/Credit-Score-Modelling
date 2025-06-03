@@ -19,5 +19,6 @@ def load_split(split_name: str) -> pd.DataFrame:
     loans     = pd.read_csv(root / "data/raw/loans.csv")
     bureau    = pd.read_csv(root / "data/raw/bureau_data.csv")
 
+    # Merge and filter
     df = customers.merge(loans, on="cust_id").merge(bureau)
     return df[df["cust_id"].isin(ids)].reset_index(drop=True)

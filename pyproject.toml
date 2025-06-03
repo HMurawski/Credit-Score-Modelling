@@ -1,5 +1,5 @@
 [project]
-name = "credit score modelling"
+name = "credit-score-modelling"
 version = "0.1.0"
 description = "credit score modelling for a bank institution"
 authors = [{name = "Hubert Murawski"}]

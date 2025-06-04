@@ -1,5 +1,5 @@
 import pandas as pd
-
+import numpy as np
 
 def add_features(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -29,4 +29,6 @@ def add_features(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df["loan_to_income"] = round(df["loan_amount"] / df["income"], 2)
     df["deliquency_ratio"] = round(df["delinquent_months"] * 100 / df["total_loan_months"], 1)
+    df["avg_dpd_per_deliquency"] = np.where(df["delinquent_months"] != 0, df["total_dpd"] / df["delinquent_months"], 0)
+    df["default"] = df["default"].astype(int)
     return df

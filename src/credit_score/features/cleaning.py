@@ -1,40 +1,45 @@
+from __future__ import annotations
+from dataclasses import dataclass
+
 import pandas as pd
+import numpy as np
 from typing import Dict, Any
 
+@dataclass
+class CleaningMeta:
+    mode_residence_type: str
+    max_fee_ratio: float = 0.03
+    loan_purpose_fix: Dict[str, str] | None = None
 
-def fit_cleaning_metadata(df_train: pd.DataFrame) -> Dict[str, Any]:
+
+def fit_cleaning_metadata(df_train: pd.DataFrame) -> CleaningMeta:
     """
-    Calculate statistics from df_train only, to apply consistent cleaning rules.
+    Taking stats from train-split only.
     """
-    metadata = {}
+    return CleaningMeta(
+        mode_residence_type=df_train["residence_type"].mode()[0],
+        loan_purpose_fix={"Personaal": "Personal"},
+    )
 
-    # 1. Most frequent value for residence_type
-    metadata["mode_residence_type"] = df_train["residence_type"].mode()[0]
-
-    # 2. Threshold: max acceptable processing_fee as % of loan_amount
-    metadata["max_fee_ratio"] = 0.03  # business rule
-
-    # 3. Value typo mapping
-    metadata["loan_purpose_fix"] = {"Personaal": "Personal"}
-
-    return metadata
-
-
-def clean_and_prepare(df: pd.DataFrame, metadata: Dict[str, Any]) -> pd.DataFrame:
+def clean_and_prepare(df: pd.DataFrame, meta: CleaningMeta) -> pd.DataFrame:
     """
     Clean and prepare the dataset using metadata from training data only.
     """
     df = df.copy()
-    n_before = len(df)
-    # 1. Fill missing residence_type with mode from training data
-    df["residence_type"] = df["residence_type"].fillna(metadata["mode_residence_type"])
 
-    # 2. Remove outliers in processing_fee using train-based ratio
-    mask = (df["processing_fee"] / df["loan_amount"]) <= metadata["max_fee_ratio"]
-    df = df[mask].copy()
+    #  Fill N/A residence_type
+    df["residence_type"] = df["residence_type"].fillna(meta.mode_residence_type)
 
-    # 3. Fix typos in loan_purpose
-    df["loan_purpose"] = df["loan_purpose"].replace(metadata["loan_purpose_fix"])
-    n_after  = len(df)
-    print(f"Outliers removed: {n_before - n_after}")
+    # Outlier ratio processing_fee / loan_amount
+    denom = df["loan_amount"].replace(0, np.nan)
+    mask  = (df["processing_fee"] / denom) <= meta.max_fee_ratio
+    outliers = (~mask & denom.notna()).sum()
+    if outliers:
+        print(f"[cleaning] Removed {outliers} fee outliers")
+    df = df[mask | denom.isna()].copy()
+
+    # loan_purpose typos fix
+    if meta.loan_purpose_fix:
+        df["loan_purpose"] = df["loan_purpose"].replace(meta.loan_purpose_fix)
+
     return df

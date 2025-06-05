@@ -28,7 +28,7 @@ data/interim/
 data/external/
 src/credit_score/app/check.py
 
-models/
+artifacts/
 *.pkl
 *.h5
 *.pt

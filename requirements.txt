@@ -9,3 +9,5 @@ seaborn==0.13.2
 shap==0.45.0
 joblib==1.4.2
 statsmodels==0.14.4
+imbalanced-learn==0.13.0
+optuna==4.3.0

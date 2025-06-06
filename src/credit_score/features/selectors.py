@@ -32,6 +32,9 @@ class VIFDropper(BaseEstimator, TransformerMixin):
         df = pd.DataFrame(X)
         # Ensure only numerical features are evaluated
         df = df.select_dtypes(include="number").replace([np.inf, -np.inf], np.nan).dropna() 
+        if df.shape[1] == 0:
+            self.keep_ = []
+            return self
         cols: List[str] = df.columns.tolist()
 
         while True and cols:  # safeguard in case all columns are dropped

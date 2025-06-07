@@ -66,11 +66,18 @@ class ColumnSubsetter(BaseEstimator, TransformerMixin):
         List of column names to retain.
     """
     def __init__(self, cols: Sequence[str]):
-        self.cols = list(cols)
-
+        self.cols = cols
+        
+    def get_params(self, deep=True):
+        return {"cols": self.cols}
+    
+    def set_params(self, **params):
+        if "cols" in params:
+            self.cols = params["cols"]
+        return self
+    
     def fit(self, X, y=None):
-        # No fitting required
         return self
 
     def transform(self, X):
-        return pd.DataFrame(X)[self.cols].copy()
+        return pd.DataFrame(X)[list(self.cols)].copy()

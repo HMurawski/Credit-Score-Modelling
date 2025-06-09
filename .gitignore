@@ -28,8 +28,8 @@ data/interim/
 data/external/
 src/credit_score/app/check.py
 
-artifacts/
-*.pkl
+
+
 *.h5
 *.pt
 *.onnx
